@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 require 'sinatra'
 require 'json'
 require_relative 'lib/account_store'
@@ -35,12 +34,15 @@ end
 # Event handler (deposit, withdraw, transfer)
 # ----------------------------
 post '/event' do
-  # Parse JSON body with symbol keys
-  data = JSON.parse(request.body.read, symbolize_names: true)
+  payload_text = request.body.read
+  begin
+    data = JSON.parse(payload_text)
+  rescue JSON::ParserError
+    status 400
+    return { error: 'invalid json' }.to_json
+  end
 
-  case data[:type]
-
-  # Deposit event
+  case data['type']
   when 'deposit'
     res = STORE.deposit(data['destination'],data['amount'])
     status 201
