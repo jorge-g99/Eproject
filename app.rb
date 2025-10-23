@@ -49,18 +49,15 @@ post '/event' do
     content_type :json
     body res.to_json
 
-  # Withdraw event
   when 'withdraw'
-    origin = data[:origin]
-    amount = data[:amount]
-
-    $accounts[origin]&.then do
-      $accounts[origin] -= amount
+    res = STORE.withdraw(data['origin'], data['amount'])
+    if res
       status 201
-      { origin: { id: origin, balance: $accounts[origin] } }.to_json
-    end || begin
+      content_type :json
+      body res.to_json
+    else
       status 404
-      '0'
+      body '0'
     end
   
   # Transfer event

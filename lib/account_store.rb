@@ -19,4 +19,13 @@ class AccountStore
     @accounts[dest] += amt
     { 'destination' => { 'id' => dest, 'balance' => @accounts[dest] } }
   end
+
+  def withdraw(origin, amount)
+    orig = origin.to_s
+    return nil unless @accounts.key?(orig)
+
+    amt = amount.to_i
+    @accounts[orig] -= amt
+    { 'origin' => { 'id' => orig, 'balance' => @accounts[orig] } }
+  end
 end
