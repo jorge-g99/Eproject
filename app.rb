@@ -62,6 +62,26 @@ post '/event' do
       status 404
       '0'
     end
+  
+  # Transfer event
+  when 'transfer'
+    origin = data[:origin]
+    destination = data[:destination]
+    amount = data[:amount]
+
+    $accounts[origin]&.then do
+      $accounts[origin] -= amount
+      $accounts[destination] ||= 0
+      $accounts[destination] += amount
+      status 201
+      {
+        origin: { id: origin, balance: $accounts[origin] },
+        destination: { id: destination, balance: $accounts[destination] }
+      }.to_json
+    end || begin
+      status 404
+      '0'
+    end
 
   # Invalid event type
   else
