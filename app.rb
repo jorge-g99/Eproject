@@ -13,7 +13,7 @@ STORE = AccountStore.new
 post '/reset' do
   STORE.reset!
   status 200
-  body 'OK'
+  'OK'
 end
 
 # ----------------------------
@@ -23,10 +23,10 @@ get '/balance' do
   account_id = params['account_id']
   if (bal = STORE.balance(account_id))
     status 200
-    body bal.to_s
+    bal.to_s
   else
     status 404
-    body '0'
+    '0'
   end
 end
 
@@ -47,42 +47,32 @@ post '/event' do
     res = STORE.deposit(data['destination'],data['amount'])
     status 201
     content_type :json
-    body res.to_json
+    res.to_json
 
   when 'withdraw'
     res = STORE.withdraw(data['origin'], data['amount'])
     if res
       status 201
       content_type :json
-      body res.to_json
+      res.to_json
     else
       status 404
-      body '0'
+      '0'
     end
   
-  # Transfer event
   when 'transfer'
-    origin = data[:origin]
-    destination = data[:destination]
-    amount = data[:amount]
-
-    $accounts[origin]&.then do
-      $accounts[origin] -= amount
-      $accounts[destination] ||= 0
-      $accounts[destination] += amount
+    res = STORE.transfer(data['origin'], data['destination'], data['amount'])
+    if res
       status 201
-      {
-        origin: { id: origin, balance: $accounts[origin] },
-        destination: { id: destination, balance: $accounts[destination] }
-      }.to_json
-    end || begin
+      content_type :json
+      res.to_json
+    else
       status 404
       '0'
     end
 
-  # Invalid event type
   else
     status 400
-    { error: 'Invalid event type' }.to_json
+    { error: 'invalid event type' }.to_json
   end
 end

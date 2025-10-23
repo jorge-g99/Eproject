@@ -28,4 +28,20 @@ class AccountStore
     @accounts[orig] -= amt
     { 'origin' => { 'id' => orig, 'balance' => @accounts[orig] } }
   end
+
+  def transfer(origin, destination, amount)
+    orig = origin.to_s
+    dest = destination.to_s
+    return nil unless @accounts.key?(orig)
+
+    amt = amount.to_i
+    @accounts[orig] -= amt
+    @accounts[dest] ||= 0
+    @accounts[dest] += amt
+
+    {
+      'origin' => { 'id' => orig, 'balance' => @accounts[orig] },
+      'destination' => { 'id' => dest, 'balance' => @accounts[dest] }
+    }
+  end
 end
