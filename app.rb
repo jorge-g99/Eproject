@@ -22,13 +22,12 @@ end
 # ----------------------------
 get '/balance' do
   account_id = params['account_id']
-  
-  $accounts[account_id]&.then do |balance|
+  if (bal = STORE.balance(account_id))
     status 200
-    balance.to_s
-  end || begin
+    body bal.to_s
+  else
     status 404
-    '0'
+    body '0'
   end
 end
 
@@ -43,15 +42,11 @@ post '/event' do
 
   # Deposit event
   when 'deposit'
-    destination = data[:destination]
-    amount = data[:amount]
-
-    $accounts[destination] ||= 0
-    $accounts[destination] += amount
-
+    res = STORE.deposit(data['destination'],data['amount'])
     status 201
-    { destination: { id: destination, balance: $accounts[destination] } }.to_json
-  
+    content_type :json
+    body res.to_json
+
   # Withdraw event
   when 'withdraw'
     origin = data[:origin]
