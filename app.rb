@@ -1,17 +1,20 @@
+# frozen_string_literal: true
 require 'sinatra'
 require 'json'
-
-$accounts = {}
+require_relative 'lib/account_store'
 
 set :bind, '0.0.0.0'
+
+$accounts = {}
+STORE = AccountStore.new
 
 # ----------------------------
 # Reset all accounts
 # ----------------------------
 post '/reset' do
-  $accounts.clear
+  STORE.reset!
   status 200
-  'OK'
+  body 'OK'
 end
 
 # ----------------------------
