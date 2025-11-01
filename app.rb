@@ -1,13 +1,9 @@
 require 'sinatra'
 require 'json'
 require_relative 'lib/account_store'
-require_relative 'repositories/account_repository'
-require_relative 'domain/transaction_service'
+require_relative './config/environment'
 
 set :bind, '0.0.0.0'
-
-REPOSITORY = AccountRepository.new
-SERVICE = TransactionService.new(REPOSITORY)
 
 STORE = AccountStore.new
 
@@ -24,13 +20,11 @@ end
 # Get account balance
 # ----------------------------
 get '/balance' do
-  account_id = params['account_id']
-  if (bal = STORE.balance(account_id))
-    status 200
-    bal.to_s
+  account = REPOSITORY.find(params['account_id'])
+  if account
+    [200, account.balance.to_s]
   else
-    status 404
-    '0'
+    [404, '0']
   end
 end
 
