@@ -8,18 +8,29 @@ Código dividido entre **camada HTTP** e **lógica de negócio**.
 
 ## ⚙️ Requisitos
 
-- Ruby 3.x  
-- Bundler instalado (`gem install bundler`)
+- Docker instalado (não é necessário Ruby ou Bundler na máquina host)
 
 ---
 
 ## 🚀 Como rodar
-    bundle install
-    ruby app.rb -p 4567
+    docker-compose up --build
 
 A API estará disponível em:  
 👉 `http://localhost:4567`
 
+Para parar a aplicação:
+
+    docker-compose up --build
+  
+---
+
+## Usando Docker diretamente
+
+    # Build da imagem
+    docker build -t sinatra_app .
+
+    # Rodar o container
+    docker run --rm -p 4567:4567 -v "$PWD":/app sinatra_app
 ---
 
 ## 🧩 Endpoints principais
@@ -61,5 +72,6 @@ Consultar saldo:
 
 - Lógica de negócio isolada em `AccountStore` → fácil de trocar por persistência (arquivo/DB) sem alterar endpoints.  
 - Implementação atende ao formato esperado nos testes: códigos HTTP e corpos (strings ou JSON).
+- Todo o desenvolvimento é feito dentro do container Docker, mantendo a máquina host limpa e sem necessidade de instalar Ruby ou gems.
 
 ---
