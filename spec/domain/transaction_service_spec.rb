@@ -19,6 +19,11 @@ RSpec.describe TransactionService do
       result = service.deposit('100', 5)
       expect(result[:destination][:balance]).to eq(15)
     end
+
+    it 'raises ArgumentError for zero or negative amounts' do
+      expect { service.deposit('100', 0) }.to raise_error(ArgumentError)
+      expect { service.deposit('100', -5) }.to raise_error(ArgumentError)
+    end
   end
 
   describe '#withdraw' do
@@ -31,11 +36,21 @@ RSpec.describe TransactionService do
       result = service.withdraw('100', 5)
       expect(result[:origin][:balance]).to eq(15)
     end
+
+    it 'returns nil for insufficient balance' do
+      service.deposit('100', 10)
+      expect(service.withdraw('100', 15)).to be_nil
+    end
+
+    it 'raises ArgumentError for zero or negative amounts' do
+      expect { service.withdraw('100', 0) }.to raise_error(ArgumentError)
+      expect { service.withdraw('100', -5) }.to raise_error(ArgumentError)
+    end
   end
 
   describe '#transfer' do
     it 'returns nil if origin does not exist' do
-      expect(service.transfer('200', '300', 15)).to be_nil
+      expect(service.transfer('200', '300', 10)).to be_nil
     end
 
     it 'transfers money from existing to new account' do
@@ -43,6 +58,19 @@ RSpec.describe TransactionService do
       result = service.transfer('100', '300', 15)
       expect(result[:origin][:balance]).to eq(5)
       expect(result[:destination][:balance]).to eq(15)
+    end
+
+    it 'returns nil if origin has insufficient balance' do
+      service.deposit('100', 10)
+      expect(service.transfer('100', '300', 20)).to be_nil
+      expect(repository.find('100').balance).to eq(10)
+      expect(repository.find('300')).to be_nil
+    end
+
+    it 'raises ArgumentError for zero or negative amounts' do
+      service.deposit('100', 10)
+      expect { service.transfer('100', '300', 0) }.to raise_error(ArgumentError)
+      expect { service.transfer('100', '300', -5) }.to raise_error(ArgumentError)
     end
   end
 end

@@ -39,16 +39,16 @@ RSpec.describe 'API Endpoints' do
       it 'creates new account' do
         post '/event', { type: 'deposit', destination: '100', amount: 10 }.to_json
         expect(last_response.status).to eq(201)
-        data = JSON.parse(last_response.body)
-        expect(data['destination']['id']).to eq('100')
-        expect(data['destination']['balance']).to eq(10)
+        data = JSON.parse(last_response.body, symbolize_names: true)
+        expect(data[:destination][:id]).to eq('100')
+        expect(data[:destination][:balance]).to eq(10)
       end
 
       it 'adds to existing account' do
         post '/event', { type: 'deposit', destination: '100', amount: 10 }.to_json
         post '/event', { type: 'deposit', destination: '100', amount: 15 }.to_json
-        data = JSON.parse(last_response.body)
-        expect(data['destination']['balance']).to eq(25)
+        data = JSON.parse(last_response.body, symbolize_names: true)
+        expect(data[:destination][:balance]).to eq(25)
       end
     end
 
@@ -62,8 +62,8 @@ RSpec.describe 'API Endpoints' do
       it 'reduces balance for existing account' do
         post '/event', { type: 'deposit', destination: '100', amount: 20 }.to_json
         post '/event', { type: 'withdraw', origin: '100', amount: 5 }.to_json
-        data = JSON.parse(last_response.body)
-        expect(data['origin']['balance']).to eq(15)
+        data = JSON.parse(last_response.body, symbolize_names: true)
+        expect(data[:origin][:balance]).to eq(15)
       end
     end
 
@@ -77,9 +77,9 @@ RSpec.describe 'API Endpoints' do
       it 'transfers money from existing account to new account' do
         post '/event', { type: 'deposit', destination: '100', amount: 15 }.to_json
         post '/event', { type: 'transfer', origin: '100', destination: '300', amount: 15 }.to_json
-        data = JSON.parse(last_response.body)
-        expect(data['origin']['balance']).to eq(0)
-        expect(data['destination']['balance']).to eq(15)
+        data = JSON.parse(last_response.body, symbolize_names: true)
+        expect(data[:origin][:balance]).to eq(0)
+        expect(data[:destination][:balance]).to eq(15)
       end
     end
   end
