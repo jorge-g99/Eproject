@@ -4,22 +4,31 @@ class TransactionService
   end
 
   def deposit(destination_id, amount)
+    raise ArgumentError, 'Amount must be positive' if amount <= 0
+
     account = @repository.find_or_create(destination_id)
     account.balance += amount
     @repository.save(account)
+
     { destination: { id: account.id, balance: account.balance } }
   end
 
   def withdraw(origin_id, amount)
+    raise ArgumentError, 'Amount must be positive' if amount <= 0
+
     account = @repository.find(origin_id)
     return nil unless account
+    return nil if account.balance < amount
 
     account.balance -= amount
     @repository.save(account)
+
     { origin: { id: account.id, balance: account.balance } }
   end
 
   def transfer(origin_id, destination_id, amount)
+    raise ArgumentError, 'Amount must be positive' if amount <= 0
+    
     withdraw_result = withdraw(origin_id, amount)
     return nil unless withdraw_result
 
