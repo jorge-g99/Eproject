@@ -38,32 +38,18 @@ end
 post '/event' do
   data = JSON.parse(request.body.read)
 
-  case data['type']
-  when 'deposit'
-    res = SERVICE.deposit(data['destination'], data['amount'])
-    [201, res.to_json]
-  when 'withdraw'
-    res = STORE.withdraw(data['origin'], data['amount'])
-    if res
-      status 201
-      res.to_json
-    else
-      status 404
-      '0'
-    end
+  result = case data['type']
+          when 'deposit'
+            SERVICE.deposit(data['destination'], data['amount'])
+          when 'withdraw'
+            SERVICE.withdraw(data['origin'], data['amount'])
+          when 'transfer'
+            SERVICE.transfer(data['origin'], data['destination'], data['amount'])
+          end
   
-  when 'transfer'
-    res = STORE.transfer(data['origin'], data['destination'], data['amount'])
-    if res
-      status 201
-      res.to_json
-    else
-      status 404
-      '0'
-    end
-
+  if result
+    [201, result.to_json]
   else
-    status 400
-    { error: 'invalid event type' }.to_json
+    [404, '0']
   end
 end
