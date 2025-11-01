@@ -1,6 +1,5 @@
 require 'sinatra'
 require 'json'
-require_relative 'lib/account_store'
 require_relative './config/environment'
 
 set :bind, '0.0.0.0'
@@ -8,8 +7,6 @@ set :bind, '0.0.0.0'
 before do
   content_type :json
 end
-
-STORE = AccountStore.new
 
 # ----------------------------
 # Reset all accounts
