@@ -5,6 +5,10 @@ require_relative './config/environment'
 
 set :bind, '0.0.0.0'
 
+before do
+  content_type :json
+end
+
 STORE = AccountStore.new
 
 # ----------------------------
@@ -32,26 +36,16 @@ end
 # Event handler (deposit, withdraw, transfer)
 # ----------------------------
 post '/event' do
-  payload_text = request.body.read
-  begin
-    data = JSON.parse(payload_text)
-  rescue JSON::ParserError
-    status 400
-    return { error: 'invalid json' }.to_json
-  end
+  data = JSON.parse(request.body.read)
 
   case data['type']
   when 'deposit'
-    res = STORE.deposit(data['destination'],data['amount'])
-    status 201
-    content_type :json
-    res.to_json
-
+    res = SERVICE.deposit(data['destination'], data['amount'])
+    [201, res.to_json]
   when 'withdraw'
     res = STORE.withdraw(data['origin'], data['amount'])
     if res
       status 201
-      content_type :json
       res.to_json
     else
       status 404
@@ -62,7 +56,6 @@ post '/event' do
     res = STORE.transfer(data['origin'], data['destination'], data['amount'])
     if res
       status 201
-      content_type :json
       res.to_json
     else
       status 404
