@@ -1,17 +1,21 @@
 require 'sinatra'
 require 'json'
 require_relative 'lib/account_store'
+require_relative 'repositories/account_repository'
+require_relative 'domain/transaction_service'
 
 set :bind, '0.0.0.0'
 
-$accounts = {}
+REPOSITORY = AccountRepository.new
+SERVICE = TransactionService.new(REPOSITORY)
+
 STORE = AccountStore.new
 
 # ----------------------------
 # Reset all accounts
 # ----------------------------
 post '/reset' do
-  STORE.reset!
+  REPOSITORY.reset!
   status 200
   'OK'
 end
