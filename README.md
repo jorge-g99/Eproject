@@ -68,6 +68,22 @@ Consultar saldo:
 
 ---
 
+## 🧪 Executando os Testes
+
+1. Acesse o container da aplicação:
+
+```bash
+docker exec -it <container_id> bash
+```
+
+2. Dentro do container, execute os testes:
+
+```bash
+bundle exec rspec
+```
+
+---
+
 ## 📌 Observações
 
 - Lógica de negócio isolada em `AccountStore` → fácil de trocar por persistência (arquivo/DB) sem alterar endpoints.  
