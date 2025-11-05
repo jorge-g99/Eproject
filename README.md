@@ -20,7 +20,7 @@ A API estará disponível em:
 
 Para parar a aplicação:
 
-    docker-compose up --build
+    docker-compose down
   
 ---
 
